@@ -1,0 +1,10 @@
+lib/
+test/
+coverage/
+.vscode/
+.eslintrc.js
+.eslintignore
+rollup.config.js
+babel.config.js
+jest.config.js
+.gitlab-ci.yml

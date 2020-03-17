@@ -1,0 +1,9 @@
+{
+  "cSpell.words": [
+    "localstorage"
+  ],
+  "markdownlint.config": {
+    "no-inline-html": false,
+    "no-duplicate-header": false
+  }
+}

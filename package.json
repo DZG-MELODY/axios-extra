@@ -1,0 +1,28 @@
+{
+  "name": "axios-extra",
+  "version": "1.0.0",
+  "description": "http methods lib based on axios",
+  "main": "dist/axios-extra.umd.js",
+  "module": "dist/axios-extra.esm.js",
+  "repository": "https://github.com/DZG-MELODY/axios-extra.git",
+  "author": "dzg <dongzhigang_bit@126.com>",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest",
+    "build": "rollup -c",
+    "pub": "npm run build && npm publish"
+  },
+  "peerDependencies": {
+    "axios": "^0.19.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^25.1.4",
+    "@types/node": "^13.9.1",
+    "@typescript-eslint/eslint-plugin": "^2.23.0",
+    "@typescript-eslint/parser": "^2.23.0",
+    "axios": "^0.19.2",
+    "eslint": "^6.8.0",
+    "jest": "^25.1.0",
+    "typescript": "^3.8.3"
+  }
+}
