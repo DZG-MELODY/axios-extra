@@ -12,3 +12,5 @@ export const isPlainObject = (val: unknown): boolean =>
   !!val
   && typeof val === 'object'
   && (val as object).constructor === Object;
+
+

@@ -1,21 +1,5 @@
-import { Method } from 'axios';
-import addRandom from './addRandom';
-import paramsClone from './paramsClone';
-import { filters, createFilter } from './filters';
+import { TransformFunction, TransformFunctionMap, TransformParamsConfig, TransformMethod, ParamsObject } from './type';
 
-export default {
-  addRandom,
-  paramsClone,
-  paramsFilter: {
-    filters,
-    createFilter
-  }
-};
-
-export type TransformMethod = Method | 'COMMON' | 'common'
-export type TransformFunction = (url: string, params: object) => [string, object]
-export type TransformFunctionMap = { [k in TransformMethod]?: TransformFunction | null }
-export type TransformParamsConfig = { [k in TransformMethod]?: Array<TransformFunction> }
 /**
  * 将参数转换处理序列合成编译为一个方法
  * @param fns
@@ -23,7 +7,7 @@ export type TransformParamsConfig = { [k in TransformMethod]?: Array<TransformFu
 export function compileParamsHandlers(fns: Array<TransformFunction> = []): null | TransformFunction {
   if (!Array.isArray(fns)) return null;
   if (fns.length === 0) return null;
-  return (orgUrl: string, orgParams: object): [string, object] => fns.reduce(([url, params], handler) => handler(url, params), [
+  return (orgUrl: string, orgParams: ParamsObject): [string, ParamsObject] => fns.reduce(([url, params], handler) => handler(url, params), [
     orgUrl,
     orgParams
   ]);

@@ -1,12 +1,16 @@
 import { AxiosRequestConfig } from 'axios';
-import { TransformMethod } from './transformParams'
+import { TransformParamsConfig } from './transformParams/type';
 
 
-
-expect interface AxiosExtraTransformConfig {
-
+export interface Response<T> {
+  data: T;
 }
 
-export interface AxiosExtraConfig extends AxiosRequestConfig {
-  transformParams:
+export interface AxiosExtConfig extends AxiosRequestConfig {
+  signature?: {};
+  isOriginResponse?: boolean;
+  transformParams?: TransformParamsConfig | false;
+  interceptors?: {};
+  hooks?: {};
+  canCancel?: boolean;
 }

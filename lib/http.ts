@@ -6,12 +6,14 @@ import {
   setTransformParams,
   compileParamsHandlers
 } from './transformParams';
+import { AxiosExtConfig } from './config';
+import { HooksCache } from './hooks/type';
 
 // 全局配置缓存
 let globalConfig = {};
 
 // 全局钩子回调
-const globalHooks = {
+const globalHooks: HooksCache = {
   request: [],
   response: []
 };
@@ -28,7 +30,7 @@ const transformParamsFn = {
   patch: null
 };
 
-export function set(options = {}) {
+export function set(options: AxiosExtConfig = {}): void {
   // 编译params transform 和common合并编译
   if (options.transformParams) {
     setTransformParams(transformParamsFn, options.transformParams);
@@ -56,6 +58,8 @@ export function reset(): void {
   // 清除所有钩子函数
   globalHooks.request = [];
   globalHooks.response = [];
+  if (globalHooks.beforeSend) delete globalHooks.beforeSend;
+  if (globalHooks.requestCancel) delete globalHooks.requestCancel;
   // 清除所有转换方法
   Object.keys(transformParamsFn).forEach((key) => {
     transformParamsFn[key] = null;
