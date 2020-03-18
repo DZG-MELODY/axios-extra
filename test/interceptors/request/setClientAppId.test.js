@@ -79,7 +79,7 @@ describe('test interceptors setClientAppId', () => {
     const orgParams = { id: 'test' };
     expect.assertions(2);
     const consoleOutput = jest.fn((message) => {
-      expect(message).toBe('[megvii-http] (interceptor) no globalConfig to get client-app-id');
+      expect(message).toBe('[axios-extra] (interceptor) no globalConfig to get client-app-id');
     });
     console.warn = consoleOutput;
 

@@ -5,19 +5,18 @@ import babel from 'rollup-plugin-babel';
 import { terser } from 'rollup-plugin-terser';
 
 export default [
-  // megvii-http
   {
     input: 'lib/index.js',
     output: [
       {
         exports: 'named',
-        file: 'dist/megvii-http.esm.js',
+        file: 'dist/axios-extra.esm.js',
         format: 'esm'
       },
       {
-        name: 'megvii-http',
+        name: 'axios-extra',
         exports: 'named',
-        file: 'dist/megvii-http.umd.js',
+        file: 'dist/axios-extra.umd.js',
         format: 'umd',
         globals: {
           axios: 'axios'

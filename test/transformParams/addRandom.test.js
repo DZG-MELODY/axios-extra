@@ -57,7 +57,7 @@ describe('test addRandom', () => {
 
   test('params which contains r field should console warning after addRandom', async () => {
     const consoleOutput = jest.fn((message) => {
-      expect(message).toBe('[megvii-http] (transformParams) random params r has exist in params object');
+      expect(message).toBe('[axios-extra] (transformParams) random params r has exist in params object');
     });
     console.warn = consoleOutput;
     const orgParams = { id: 'test', r: 'random' };

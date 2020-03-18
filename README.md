@@ -5,7 +5,7 @@ extra supports for axios
 <details>
   <summary>文档目录(展开查看)</summary>
 
-- [megvii-http](#megvii-http)
+- [axios-extra](#axios-extra)
 
   - [快速开始](#%e5%bf%ab%e9%80%9f%e5%bc%80%e5%a7%8b)
     - [安装组件](#%e5%ae%89%e8%a3%85%e7%bb%84%e4%bb%b6)
@@ -47,7 +47,7 @@ extra supports for axios
 >
 > 3.提供开箱即用的实用配置，快速支持业务开发
 
-megvii-http 提供了完善的单元测试，保证代码的质量
+axios-extra 提供了完善的单元测试，保证代码的质量
 
 ![img](./assets/coverage.png)
 
@@ -55,37 +55,29 @@ megvii-http 提供了完善的单元测试，保证代码的质量
 
 ## 快速开始
 
-确保可访问私服源：
-
-```bash
---registry=http://10.199.1.20:8081/repository/npmmegvii/
-or
---registry=http://10.199.1.17:7001/
-```
-
 ### 安装组件
 
 ```bash
-npm install megvii-http --save
+npm install axios-extra --save
 ```
 
 ### 按命名空间引用
 
 ```js
-import megHttp from "megvii-http";
+import axiosExt from "axios-extra";
 
 // 设置全局配置
-megHttp.set({
+axiosExt.set({
   // config
 });
 
-megHttp.httpGet("http://example");
+axiosExt.httpGet("http://example");
 ```
 
 ### 按需引用
 
 ```js
-import { set as setConfig, httpGet } from "megvii-http";
+import { set as setConfig, httpGet } from "axios-extra";
 
 // 设置全局配置
 setConfig({
@@ -181,7 +173,7 @@ HttpOptions 在经过处理后，最后传入到 axios 实例中的配置都将�
 
   // 拦截器配置
   // axios中拦截器的设置是需要通过实例注册，
-  // 在megvii-http中并不能直接获取到实例，
+  // 在axios-extra中并不能直接获取到实例，
   // 而是在配置中设置，库自动完成注册过程
   interceptors:{
     // 请求阶段的拦截器
@@ -195,7 +187,7 @@ HttpOptions 在经过处理后，最后传入到 axios 实例中的配置都将�
 
   // 全局钩子方法
   // 一些业务需要在请求的不同阶段或者不同条件下触发，
-  // megvii-http提供了一些全局钩子用于处理这类情况
+  // axios-extra提供了一些全局钩子用于处理这类情况
   // 钩子方法支持自定义
   // 钩子方法只能在全局设置，方法调用时配置不生效
   hooks:{
@@ -246,7 +238,7 @@ axios 实例请求返回的结果（`AxiosResponse`）按照官方文档如下�
 }
 ```
 
-megvii-http 的响应结果（`HttpResponse`）是在`AxiosResponse`的基础上进行过滤和处理后返回的，其只返回最终的数据。
+axios-extra 的响应结果（`HttpResponse`）是在`AxiosResponse`的基础上进行过滤和处理后返回的，其只返回最终的数据。
 **如果想要返回原始的响应结果，可以在发送时配置参数`isOriginResponse`为 true**
 
 ```js
@@ -263,7 +255,7 @@ megvii-http 的响应结果（`HttpResponse`）是在`AxiosResponse`的基础上
 ### transformParams 参数转换器
 
 参数转换器用于在向 axios 实例设置参数前，将请求参数做前置处理。
-参数转换器是一个方法，megvii-http 在转换时会将传入数组中的所有转换器生成一个处理器。
+参数转换器是一个方法，axios-extra 在转换时会将传入数组中的所有转换器生成一个处理器。
 
 **注意：参数转化器在方法中使用时不提供 merge 功能，一旦配置则会覆盖掉全局的配置**。
 
@@ -280,7 +272,7 @@ function transform(url, params) {
 
 #### 使用内置的参数转换器
 
-megvii-http 内置了多个可直接使用的参数转换器：
+axios-extra 内置了多个可直接使用的参数转换器：
 
 | 转换器                    | 功能                                    | 说明                                                                 |
 | ------------------------- | --------------------------------------- | -------------------------------------------------------------------- |
@@ -299,7 +291,7 @@ megvii-http 内置了多个可直接使用的参数转换器：
 下面是一个使用内置转换器的示例：
 
 ```js
-import { set as setConfig, transformParams } from "megvii-http";
+import { set as setConfig, transformParams } from "axios-extra";
 
 // 设置全局的参数转换器
 setConfig({
@@ -317,7 +309,7 @@ setConfig({
 
 过滤器由于使用递归遍历，为了提高性能，应该在一个遍历过程中完成所有过滤操作，因此**不建议同时使用多个过滤器，如果内置过滤器不能满足条件，可以自定义过滤器**
 
-megvii-http 提供了`createFilter`方法用于生成过滤器:
+axios-extra 提供了`createFilter`方法用于生成过滤器:
 
 **createFilter( validators )**  
 [params] **validators**: `Array<string|function>` 验证器队列  
@@ -348,7 +340,7 @@ const customValidate2 = value => typeof value === "string" && value.length > 10;
 下面是一个使用自定义过滤器的例子：
 
 ```js
-import { set as setConfig, transformParams } from "megvii-http";
+import { set as setConfig, transformParams } from "axios-extra";
 const { filters } = transformParams;
 
 // 自定义验证器
@@ -375,7 +367,7 @@ setConfig({
 
 ```js
 // 不使用全局转换器
-megHttp.httpPost(
+axiosExt.httpPost(
   "https://test/",
   { test: 1 },
   {
@@ -384,7 +376,7 @@ megHttp.httpPost(
 );
 
 // 使用自己的转换器覆盖全局
-megHttp.httpPost(
+axiosExt.httpPost(
   "https://test/",
   { test: 1 },
   {
@@ -399,7 +391,7 @@ megHttp.httpPost(
 
 axios 的配置项中并没有对拦截器的设置，需要通过实例注册使用。[（使用参考）](https://github.com/axios/axios#interceptors)
 
-megvii-http 中实现了对拦截器的配置，只要在 config 中添加 interceptors 选项，即可自动完成拦截器注册。
+axios-extra 中实现了对拦截器的配置，只要在 config 中添加 interceptors 选项，即可自动完成拦截器注册。
 
 一个拦截器需要配置两个属性：resolve 和 reject 分别来对处理结果进行处置，如果设置为一个方法，则默认作为 resolve。**注意区分 request 阶段和 response 阶段的拦截器参数是不同的**。
 
@@ -449,7 +441,7 @@ const interceptor2 = (response)=>{
 一个使用拦截器的示例：
 
 ```js
- import {set as setConfig, transformParams} from 'megvii-http';
+ import {set as setConfig, transformParams} from 'axios-extra';
 
  // 设置全局的参数转换器
  setConfig({
@@ -474,7 +466,7 @@ const interceptor2 = (response)=>{
 
 #### 内置拦截器
 
-megvii-http 提供了几个内置拦截器，如下：
+axios-extra 提供了几个内置拦截器，如下：
 
 | 拦截器         | 功能                              | 阶段    | 备注                                     |
 | -------------- | --------------------------------- | ------- | ---------------------------------------- |
@@ -484,7 +476,7 @@ megvii-http 提供了几个内置拦截器，如下：
 使用内置拦截器示例：
 
 ```js
-import { set as setConfig, interceptors } from "megvii-http";
+import { set as setConfig, interceptors } from "axios-extra";
 
 // 设置全局的参数转换器
 setConfig({
@@ -499,13 +491,13 @@ setConfig({
 
 ### hooks 全局钩子
 
-megvii-http 提供了一些全局钩子，用于在请求各阶段处理一些业务逻辑。
+axios-extra 提供了一些全局钩子，用于在请求各阶段处理一些业务逻辑。
 
 钩子方法只支持全局配置，因此一旦设置将会全局生效。
 
 #### 内置钩子
 
-megvii-http 在 request 阶段和 response 阶段提供了一些内置钩子，如下：
+axios-extra 在 request 阶段和 response 阶段提供了一些内置钩子，如下：
 
 | 拦截器           | 功能                                  | 阶段     | 备注                      |
 | ---------------- | ------------------------------------- | -------- | ------------------------- |
@@ -517,7 +509,7 @@ megvii-http 在 request 阶段和 response 阶段提供了一些内置钩子，�
 示例如下：
 
 ```js
-import {set as setConfig, interceptors} from 'megvii-http';
+import {set as setConfig, interceptors} from 'axios-extra';
 
 // 设置全局的参数转换器
 setConfig({
@@ -538,7 +530,7 @@ setConfig({
 
 #### 自定义钩子
 
-megvii-http 除了内置钩子外，还可以自定义钩子方法。
+axios-extra 除了内置钩子外，还可以自定义钩子方法。
 
 自定义钩子需要提供两个参数：trigger 和 callback 分别对应触发器和回调方法。如果设置为方法则默认设置为必定触发，设置方法则为默认回调。
 
@@ -589,7 +581,7 @@ axios 在配置时会过滤掉无关参数，因此在`response`过程中其`con
 
 我们在使用时，会存在一种场景，对于某个请求我们希望在发送前设置一个特定的签名，当签名不同时，对于 response 的处理将会不一致。
 
-megvii-http 提供了`signature`参数用于处理这种场景。发送请求时，设置的标签，会在 response 的 hooks 中获取到（如果使用了 originResponse,则可以直接在返回结果中获取）。
+axios-extra 提供了`signature`参数用于处理这种场景。发送请求时，设置的标签，会在 response 的 hooks 中获取到（如果使用了 originResponse,则可以直接在返回结果中获取）。
 
 ```js
 // 响应响应钩子
@@ -604,7 +596,7 @@ setConfig({
   }
 });
 
-await megHttp.httpPost(
+await axiosExt.httpPost(
   "https://test/",
   { test: 1 },
   {
@@ -616,7 +608,7 @@ await megHttp.httpPost(
 );
 
 // 直接获取原始response进行处理
-const ret = await megHttp.httpPost(
+const ret = await axiosExt.httpPost(
   "https://test/",
   { test: 1 },
   {
@@ -635,12 +627,12 @@ console.log(ret.signature.isCustom);
 
 ### 取消请求
 
-megvii-http 对于请求取消做了良好的封装，使用时直接在配置中设置`canCancel:true`即支持取消功能。其触发器直接挂载在请求实例上。
+axios-extra 对于请求取消做了良好的封装，使用时直接在配置中设置`canCancel:true`即支持取消功能。其触发器直接挂载在请求实例上。
 
 取消请求后，如果在全局注册了回调，则会触发回调。也可以在`Promise.then`的 reject 中监听。
 
 ```js
-import { httpGet } from "megvii-http";
+import { httpGet } from "axios-extra";
 
 const requestPromise = httpGet(
   "http://test",
@@ -668,4 +660,4 @@ requestPromise.cancel("this is message");
 
 ## issue
 
-使用中存在任何问题或者建议请提[issue](https://git-pd.megvii-inc.com/ai-guardians/sst-fe/base-library-group/megvii-http/issues)
+使用中存在任何问题或者建议请提[issue]
