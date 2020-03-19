@@ -1,13 +1,12 @@
 import axios from 'axios';
 import setCancelConfig from './cancel/index';
 import { setInterceptors, resetInterceptors, mergeInterceptors } from './interceptors';
-import setHooks from './hooks';
-import {
-  setTransformParams,
-  compileParamsHandlers
-} from './transformParams';
+import { setHooks } from './hooks';
+import { setTransformParams, compileParamsHandlers } from './transformParams';
 import { AxiosExtConfig } from './config';
 import { HooksCache } from './hooks/type';
+import { InterceptorConfig } from './interceptors/type';
+import { TransformMethod, TransformFunctionMap } from './transformParams/type';
 
 // 全局配置缓存
 let globalConfig = {};
@@ -19,16 +18,10 @@ const globalHooks: HooksCache = {
 };
 
 // 全局拦截器缓存
-let globalInterceptors = {};
+let globalInterceptors: InterceptorConfig = {};
 
 // 编译后的方法
-const transformParamsFn = {
-  get: null,
-  post: null,
-  put: null,
-  delete: null,
-  patch: null
-};
+const transformParamsFn: TransformFunctionMap = {};
 
 export function set(options: AxiosExtConfig = {}): void {
   // 编译params transform 和common合并编译
@@ -120,10 +113,11 @@ function createHttpMethod(method) {
       if (config.interceptors.merge) {
         setInterceptors(
           axiosInstance,
-          mergeInterceptors(config.interceptors, globalInterceptors)
+          mergeInterceptors(config.interceptors, globalInterceptors),
+          false
         );
       } else {
-        setInterceptors(axiosInstance, config.interceptors);
+        setInterceptors(axiosInstance, config.interceptors, false);
       }
       delete config.interceptors;
     }

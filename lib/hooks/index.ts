@@ -5,7 +5,7 @@ import { HooksConfig, isRequestHookFn, HooksCache, isResponseHookFn } from "./ty
  * @param hookCache 
  * @param hooksConfig 
  */
-export default function setHooks(hookCache: HooksCache, hooksConfig: HooksConfig = {}): void {
+export function setHooks(hookCache: HooksCache, hooksConfig: HooksConfig = {}): void {
 
   const { request, response, beforeSend, requestCancel } = hooksConfig;
 
