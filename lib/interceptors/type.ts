@@ -1,7 +1,7 @@
-import { AxiosExtConfig } from "../config";
+import { AxiosExtGlobalConfig } from "../config";
 import { AxiosResponse } from "axios";
 
-export type RequestInterceptorFn = (config: AxiosExtConfig) => AxiosExtConfig | Promise<AxiosExtConfig>
+export type RequestInterceptorFn = (config: AxiosExtGlobalConfig) => AxiosExtGlobalConfig | Promise<AxiosExtGlobalConfig>
 export type RequestInterceptorConfig = {
   resolve: RequestInterceptorFn;
   reject: (error: Error) => Promise<Error>;
@@ -23,7 +23,13 @@ export function isInterceptorFn<T extends RequestInterceptorFn | ResponseInterce
 }
 
 
-export interface InterceptorConfig {
+export interface InterceptorGlobalConfig {
+  request?: Array<RequestInterceptor>;
+  response?: Array<ResponseInterceptor>;
+}
+
+export interface InterceptorInstanceConfig {
+  merge?: boolean;
   request?: Array<RequestInterceptor>;
   response?: Array<ResponseInterceptor>;
 }

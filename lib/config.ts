@@ -1,16 +1,35 @@
 import { AxiosRequestConfig } from 'axios';
-import { TransformParamsConfig } from './transformParams/type';
+import { TransformParamsConfig, TransformFunction } from './transformParams/type';
+import { InterceptorGlobalConfig, InterceptorInstanceConfig } from './interceptors/type';
+import { HooksConfig } from './hooks/type';
 
 
 export interface Response<T> {
   data: T;
 }
 
-export interface AxiosExtConfig extends AxiosRequestConfig {
-  signature?: {};
-  isOriginResponse?: boolean;
-  transformParams?: TransformParamsConfig | false;
-  interceptors?: {};
-  hooks?: {};
-  canCancel?: boolean;
+export interface AxiosExtGlobalConfig extends AxiosRequestConfig {
+  transformConfig?: TransformParamsConfig;
+  interceptors?: InterceptorGlobalConfig;
+  hooks?: HooksConfig;
 }
+
+// export interface AxiosExtInstanceConfig extends AxiosRequestConfig {
+//   signature?: {};
+//   isOriginResponse?: boolean;
+//   transformParams?: Array<TransformFunction> | false;
+//   interceptors?: InterceptorInstanceConfig;
+//   hooks?: HooksConfig;
+//   canCancel?: boolean;
+// }
+
+export interface AxiosExtInstanceStrictConfig extends AxiosRequestConfig {
+  signature: { [k: string]: unknown };
+  isOriginResponse: boolean;
+  transformParams: Array<TransformFunction> | false;
+  interceptors: InterceptorInstanceConfig;
+  hooks: HooksConfig;
+  canCancel: boolean;
+}
+
+export type AxiosExtInstanceConfig = Partial<AxiosExtInstanceStrictConfig>

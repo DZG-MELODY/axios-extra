@@ -1,10 +1,10 @@
-import { AxiosExtConfig } from "../config";
+import { AxiosExtInstanceConfig } from "../config";
 import { AxiosResponse } from "axios";
 
-export type RequestHookFn = (config: AxiosExtConfig) => void
+export type RequestHookFn = (config: AxiosExtInstanceConfig) => void
 export type RequestHookConfig = {
-  trigger: (config: AxiosExtConfig) => boolean;
-  callback: (config: AxiosExtConfig) => void;
+  trigger: (config: AxiosExtInstanceConfig) => boolean;
+  callback: (config: AxiosExtInstanceConfig) => void;
 }
 export type RequestHook = RequestHookFn | RequestHookConfig
 
@@ -12,11 +12,14 @@ export function isRequestHookFn(val: RequestHook): val is RequestHookFn {
   return typeof val === 'function';
 }
 
+export interface AxiosExtResponse<T> extends AxiosResponse<T> {
+  signature: { [k: string]: unknown };
+}
 
-export type ResponseHookFn = (config: AxiosResponse) => void
+export type ResponseHookFn = (config: AxiosExtResponse<unknown>) => void
 export type ResponseHookConfig = {
-  trigger: (config: AxiosResponse) => boolean;
-  callback: (config: AxiosResponse) => void;
+  trigger: (config: AxiosExtResponse<unknown>) => boolean;
+  callback: (config: AxiosExtResponse<unknown>) => void;
 }
 export type ResponseHook = ResponseHookFn | ResponseHookConfig
 

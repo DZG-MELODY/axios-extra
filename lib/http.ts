@@ -1,12 +1,12 @@
-import axios from 'axios';
+import axios, { AxiosInstance, Canceler } from 'axios';
 import setCancelConfig from './cancel/index';
 import { setInterceptors, resetInterceptors, mergeInterceptors } from './interceptors';
 import { setHooks } from './hooks';
 import { setTransformParams, compileParamsHandlers } from './transformParams';
-import { AxiosExtConfig } from './config';
-import { HooksCache } from './hooks/type';
-import { InterceptorConfig } from './interceptors/type';
-import { TransformMethod, TransformFunctionMap } from './transformParams/type';
+import { AxiosExtGlobalConfig, AxiosExtInstanceConfig } from './config';
+import { HooksCache, AxiosExtResponse } from './hooks/type';
+import { InterceptorGlobalConfig } from './interceptors/type';
+import { TransformMethod, TransformFunctionMap, TransformFunction, ParamsObject } from './transformParams/type';
 
 // 全局配置缓存
 let globalConfig = {};
@@ -18,16 +18,15 @@ const globalHooks: HooksCache = {
 };
 
 // 全局拦截器缓存
-let globalInterceptors: InterceptorConfig = {};
-
+let globalInterceptors: InterceptorGlobalConfig = {};
 // 编译后的方法
 const transformParamsFn: TransformFunctionMap = {};
 
-export function set(options: AxiosExtConfig = {}): void {
+export function setConfig(options: AxiosExtGlobalConfig = {}): void {
   // 编译params transform 和common合并编译
-  if (options.transformParams) {
-    setTransformParams(transformParamsFn, options.transformParams);
-    delete options.transformParams;
+  if (options.transformConfig) {
+    setTransformParams(transformParamsFn, options.transformConfig);
+    delete options.transformConfig;
   }
   // 注册拦截器
   if (options.interceptors) {
@@ -45,7 +44,7 @@ export function set(options: AxiosExtConfig = {}): void {
   globalConfig = options;
 }
 
-export function reset(): void {
+export function resetConfig(): void {
   // 重置配置对象
   globalConfig = {};
   // 清除所有钩子函数
@@ -54,7 +53,7 @@ export function reset(): void {
   if (globalHooks.beforeSend) delete globalHooks.beforeSend;
   if (globalHooks.requestCancel) delete globalHooks.requestCancel;
   // 清除所有转换方法
-  Object.keys(transformParamsFn).forEach((key) => {
+  (Object.keys(transformParamsFn) as Array<TransformMethod>).forEach((key) => {
     transformParamsFn[key] = null;
   });
   // 重置拦截器
@@ -62,26 +61,34 @@ export function reset(): void {
   globalInterceptors = {};
 }
 
+type AxiosExtMethod = 'get' | 'post' | 'put' | 'delete' | 'patch'
+
+class AxiosExtPromise<T> extends Promise<T> {
+  public cancel?: Canceler;
+}
+
 /**
  * 生成请求方法
  * @param {string} method
  */
-function createHttpMethod(method) {
-  return (url, params = {}, options = {}) => {
+function createHttpMethod(method: AxiosExtMethod) {
+  return (url: string, params: ParamsObject = {}, options: AxiosExtInstanceConfig = {}): AxiosExtPromise<unknown> => {
     const config = Object.assign({}, globalConfig, options);
-
     // 参数转换,自定义直接覆盖，不做合并
-    let transformFn = null;
+    let transformFn: TransformFunction | null = null;
+    // 判断是否存在转换器，如果有转换器则使用自定义转换器
     if (Object.prototype.hasOwnProperty.call(options, 'transformParams')) {
       if (options.transformParams === false) {
         transformFn = null;
-      } else if (Array.isArray(options.transformParams)) {
-        transformFn = compileParamsHandlers(config.transformParams);
       } else {
-        throw new Error('method transformParams must be Array');
+        if (Array.isArray(options.transformParams)) {
+          transformFn = compileParamsHandlers(config.transformParams || []);
+        } else {
+          throw new Error('method transformParams must be Array');
+        }
       }
     } else {
-      transformFn = transformParamsFn[method];
+      transformFn = transformParamsFn[method] ?? null;
     }
 
     if (transformFn) {
@@ -93,23 +100,19 @@ function createHttpMethod(method) {
       } else {
         config.data = Object.assign(transParams, options.data || {});
       }
-      delete config.transformParams;
     } else {
       if (method === 'get') {
         config.params = params;
       } else {
         config.data = params;
       }
-      delete config.transformParams;
     }
 
+    let axiosInstance: AxiosInstance = axios;
+
     // 拦截器设置
-    const isNewInstance = Object.prototype.hasOwnProperty.call(
-      config,
-      'interceptors'
-    );
-    const axiosInstance = isNewInstance ? axios.create() : axios;
-    if (isNewInstance) {
+    if (config.interceptors) {
+      axiosInstance = axios.create();
       if (config.interceptors.merge) {
         setInterceptors(
           axiosInstance,
@@ -119,15 +122,13 @@ function createHttpMethod(method) {
       } else {
         setInterceptors(axiosInstance, config.interceptors, false);
       }
-      delete config.interceptors;
     }
 
     // 设置取消触发器
-    let cancelTrigger = null;
+    let cancelTrigger: Canceler | null = null;
     if (options.canCancel) {
       cancelTrigger = setCancelConfig(config);
     }
-
     // 触发钩子函数
     globalHooks.request.forEach((hook) => {
       if (hook.trigger(config)) hook.callback(config);
@@ -143,13 +144,13 @@ function createHttpMethod(method) {
     // 是否返回原始response
     const isOriginResponse = !!config.isOriginResponse;
     // 初始化实例
-    const promise = new Promise((resolve, reject) => {
+    const promise = new AxiosExtPromise<unknown>((resolve, reject) => {
       axiosInstance(config)
         .then((response) => {
-          response.signature = signature;
+          (response as AxiosExtResponse<unknown>).signature = signature;
           // 执行钩子函数
           globalHooks.response.forEach((hook) => {
-            if (hook.trigger(response)) hook.callback(response);
+            if (hook.trigger(response as AxiosExtResponse<unknown>)) hook.callback(response as AxiosExtResponse<unknown>);
           });
           // 只将数据透传到下一层
           // ?是否应该全部透传
@@ -187,6 +188,6 @@ export default {
   httpPut,
   httpDelete,
   httpPatch,
-  set,
-  reset
+  setConfig,
+  resetConfig
 };

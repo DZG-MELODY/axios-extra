@@ -1,4 +1,4 @@
-import { InterceptorCache, RequestInterceptor, ResponseInterceptor, isInterceptorFn, ResponseInterceptorFn, RequestInterceptorFn, InterceptorConfig } from "./type";
+import { InterceptorCache, RequestInterceptor, ResponseInterceptor, isInterceptorFn, ResponseInterceptorFn, RequestInterceptorFn, InterceptorGlobalConfig } from "./type";
 import { AxiosInterceptorManager, AxiosRequestConfig, AxiosResponse, AxiosInstance } from "axios";
 
 // 拦截器缓存
@@ -53,7 +53,7 @@ function useResponseInterceptors(
  * @param axiosInstance 
  * @param interceptorsConfig 
  */
-export function setInterceptors(axiosInstance: AxiosInstance, interceptorsConfig: InterceptorConfig = {}, isCache = true): void {
+export function setInterceptors(axiosInstance: AxiosInstance, interceptorsConfig: InterceptorGlobalConfig = {}, isCache = true): void {
   if (interceptorsConfig.request) {
     useRequestInterceptors(
       axiosInstance.interceptors.request,
@@ -88,8 +88,8 @@ export function resetInterceptors(axiosInstance: AxiosInstance): void {
  * @param target 
  * @param source 
  */
-export function mergeInterceptors(target: InterceptorConfig, source: InterceptorConfig): InterceptorConfig {
-  const ret: InterceptorConfig = {
+export function mergeInterceptors(target: InterceptorGlobalConfig, source: InterceptorGlobalConfig): InterceptorGlobalConfig {
+  const ret: InterceptorGlobalConfig = {
     request: [],
     response: []
   };
